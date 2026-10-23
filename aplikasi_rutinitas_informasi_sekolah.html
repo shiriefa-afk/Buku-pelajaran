@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Rutinitas & Informasi Sekolah Anak</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Fredoka & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        window.tailwind = window.tailwind || {};
+        window.tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        display: ['Fredoka', 'cursive']
+                    },
+                    colors: {
+                        brand: {
+                            50: '#fffbe1',
+                            100: '#fff3b8',
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            700: '#b45309'
+                        }
+                    }
+                }
+            }
+        };
+    </script>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
+
+    <!-- TOP NAVBAR -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap justify-between items-center gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 bg-amber-500 rounded-2xl flex items-center justify-center text-white text-2xl shadow-lg shadow-amber-200">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div>
+                    <h1 class="font-display text-xl sm:text-2xl font-bold text-slate-800 leading-tight">Semangat Sekolah!</h1>
+                    <p class="text-xs text-slate-500 font-medium">Asisten Rutinitas & Belajar Pagi</p>
+                </div>
+            </div>
+
+            <!-- Jam Digital & Alarm Quick Status -->
+            <div class="flex items-center gap-4 bg-amber-50 px-4 py-2 rounded-2xl border border-amber-200">
+                <div class="text-center">
+                    <div id="liveClock" class="font-display text-2xl font-bold text-amber-700 tracking-wider">00:00:00</div>
+                    <div id="liveDate" class="text-[11px] text-amber-800 font-semibold uppercase tracking-wider">Senin, 1 Jan 2026</div>
+                </div>
+                <div class="h-8 w-[1px] bg-amber-200"></div>
+                <div class="flex flex-col items-center">
+                    <span class="text-[10px] text-slate-500 font-bold uppercase">Alarm Pagi</span>
+                    <span class="text-xs font-bold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full flex items-center gap-1">
+                        <i class="fa-solid fa-bell text-[10px]"></i> 05:00 WIB
+                    </span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full flex-grow space-y-8">
+
+        <!-- HERO BANNER / QUICK ALARM BAR -->
+        <section class="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 rounded-3xl p-6 sm:p-8 text-white shadow-xl shadow-amber-500/20 relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 opacity-10 text-white text-[180px] pointer-events-none select-none">
+                <i class="fa-solid fa-sun"></i>
+            </div>
+            
+            <div class="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+                <div class="md:col-span-2 space-y-3">
+                    <span class="bg-white/20 backdrop-blur-md px-3.5 py-1 rounded-full text-xs font-bold tracking-wide uppercase inline-flex items-center gap-2">
+                        <i class="fa-solid fa-clock"></i> Pengingat Bangun Jam 05.00 Pagi
+                    </span>
+                    <h2 class="font-display text-2xl sm:text-4xl font-bold leading-snug">
+                        Siapkan Diri & Tas Sekolah dengan Ceria Hari Ini!
+                    </h2>
+                    <p class="text-amber-100 text-sm sm:text-base leading-relaxed max-w-xl">
+                        Dengarkan kata-kata bijak, musik semangat, dan periksa perlengkapan buku mata pelajaranmu agar tidak ada yang tertinggal.
+                    </p>
+                </div>
+                <div class="flex flex-col gap-3 justify-center items-stretch bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20">
+                    <button id="btnTestAlarm" onclick="playWakeUpRoutine()" class="bg-white text-amber-700 hover:bg-amber-50 font-bold py-3 px-5 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 text-sm sm:text-base">
+                        <i class="fa-solid fa-volume-high text-amber-500 text-lg"></i>
+                        <span>Tes Suara Bangun 05:00</span>
+                    </button>
+                    <button onclick="playMotivationalAudio()" class="bg-amber-900/30 hover:bg-amber-900/40 text-white border border-white/30 font-semibold py-2.5 px-4 rounded-xl transition-all flex items-center justify-center gap-2 text-xs sm:text-sm">
+                        <i class="fa-solid fa-quote-left text-amber-200"></i>
+                        <span>Audio Kata Bijak Gemini</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- MAIN APP NAVIGATION TABS -->
+        <nav class="flex border-b border-slate-200 gap-2 sm:gap-6 overflow-x-auto pb-1 text-sm font-bold">
+            <button onclick="switchTab('tasTab')" id="nav-tasTab" class="tab-btn px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 whitespace-nowrap bg-amber-500 text-white shadow-md shadow-amber-200">
+                <i class="fa-solid fa-bag-shopping"></i> Siapkan Tas & Jadwal
+            </button>
+            <button onclick="switchTab('alarmTab')" id="nav-alarmTab" class="tab-btn px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 whitespace-nowrap text-slate-600 hover:bg-slate-100">
+                <i class="fa-solid fa-bell"></i> Alarm Bangun 05.00
+            </button>
+            <button onclick="switchTab('motivasiTab')" id="nav-motivasiTab" class="tab-btn px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 whitespace-nowrap text-slate-600 hover:bg-slate-100">
+                <i class="fa-solid fa-lightbulb"></i> Kata Bijak & Musik
+            </button>
+            <button onclick="switchTab('youtubeTab')" id="nav-youtubeTab" class="tab-btn px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 whitespace-nowrap text-slate-600 hover:bg-slate-100">
+                <i class="fa-brands fa-youtube text-red-500"></i> YouTube Belajar & Edukasi
+            </button>
+            <button onclick="switchTab('aiTab')" id="nav-aiTab" class="tab-btn px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 whitespace-nowrap text-slate-600 hover:bg-slate-100">
+                <i class="fa-solid fa-robot text-purple-600"></i> Teman Belajar Gemini AI
+            </button>
+        </nav>
+
+        <!-- TAB 1: SIAPKAN TAS & JADWAL MATEMATIKA / PELAJARAN -->
+        <section id="tasTab" class="tab-content block space-y-6">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
+                
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+                    <div>
+                        <h3 class="font-display text-2xl font-bold text-slate-800 flex items-center gap-3">
+                            <span class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-lg">
+                                <i class="fa-solid fa-box-archive"></i>
+                            </span>
+                            Cek & Masukkan Buku Pelajaran
+                        </h3>
+                        <p class="text-sm text-slate-500 mt-1">Pilih hari untuk melihat daftar buku yang harus dimasukkan ke tas.</p>
+                    </div>
+
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="speakScheduleTTS()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 px-4 rounded-2xl shadow-lg shadow-emerald-200 transition-all flex items-center justify-center gap-2 text-sm">
+                            <i class="fa-solid fa-circle-play text-lg"></i>
+                            <span>Audio Pengingat Tas</span>
+                        </button>
+                        <button onclick="generateAiRewardSticker()" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 px-4 rounded-2xl shadow-lg shadow-purple-200 transition-all flex items-center justify-center gap-2 text-sm">
+                            <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i>
+                            <span>Buat Stiker Reward AI</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- PILIHAN HARI (SENIN - SABTU) -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+                    <button onclick="selectDay('Senin')" id="dayBtn-Senin" class="day-btn p-3 rounded-2xl border border-slate-200 font-bold text-center transition-all hover:border-amber-400">
+                        <span class="block text-xs font-semibold text-slate-400 uppercase">Hari 1</span>
+                        <span class="text-base text-slate-700">Senin</span>
+                    </button>
+                    <button onclick="selectDay('Selasa')" id="dayBtn-Selasa" class="day-btn p-3 rounded-2xl border border-slate-200 font-bold text-center transition-all hover:border-amber-400">
+                        <span class="block text-xs font-semibold text-slate-400 uppercase">Hari 2</span>
+                        <span class="text-base text-slate-700">Selasa</span>
+                    </button>
+                    <button onclick="selectDay('Rabu')" id="dayBtn-Rabu" class="day-btn p-3 rounded-2xl border border-slate-200 font-bold text-center transition-all hover:border-amber-400">
+                        <span class="block text-xs font-semibold text-slate-400 uppercase">Hari 3</span>
+                        <span class="text-base text-slate-700">Rabu</span>
+                    </button>
+                    <button onclick="selectDay('Kamis')" id="dayBtn-Kamis" class="day-btn p-3 rounded-2xl border border-slate-200 font-bold text-center transition-all hover:border-amber-400">
+                        <span class="block text-xs font-semibold text-slate-400 uppercase">Hari 4</span>
+                        <span class="text-base text-slate-700">Kamis</span>
+                    </button>
+                    <button onclick="selectDay('Jumat')" id="dayBtn-Jumat" class="day-btn p-3 rounded-2xl border border-slate-200 font-bold text-center transition-all hover:border-amber-400">
+                        <span class="block text-xs font-semibold text-slate-400 uppercase">Hari 5</span>
+                        <span class="text-base text-slate-700">Jumat</span>
+                    </button>
+                    <button onclick="selectDay('Sabtu')" id="dayBtn-Sabtu" class="day-btn p-3 rounded-2xl border border-slate-200 font-bold text-center transition-all hover:border-amber-400">
+                        <span class="block text-xs font-semibold text-slate-400 uppercase">Hari 6</span>
+                        <span class="text-base text-slate-700">Sabtu</span>
+                    </button>
+                </div>
+
+                <!-- CHECKLIST MATAPELAJARAN & PERLENGKAPAN HARI INI -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-4">
+                    <!-- Column 1: Book Checklist -->
+                    <div class="lg:col-span-2 bg-slate-50 p-6 rounded-3xl border border-slate-200 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h4 id="scheduleTitle" class="font-display text-xl font-bold text-slate-800">
+                                Jadwal Buku Hari Senin
+                            </h4>
+                            <span id="packProgress" class="text-xs font-bold bg-amber-100 text-amber-800 px-3 py-1 rounded-full">
+                                0 / 0 Terkemas
+                            </span>
+                        </div>
+
+                        <p class="text-xs text-slate-500">Centang setiap buku yang sudah kamu masukkan ke dalam tas sekolah:</p>
+
+                        <div id="subjectChecklistContainer" class="space-y-2.5 min-h-[160px]">
+                            <!-- Generated by JS -->
+                        </div>
+
+                        <!-- Add custom subject input -->
+                        <div class="flex gap-2 pt-2">
+                            <input type="text" id="newSubjectInput" placeholder="Tambah pelajaran/peralatan baru..." class="flex-grow px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                            <button onclick="addNewSubject()" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-1">
+                                <i class="fa-solid fa-plus"></i> Tambah
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Column 2: Mandatory Pack Items -->
+                    <div class="bg-amber-50/60 p-6 rounded-3xl border border-amber-200/60 space-y-4">
+                        <h4 class="font-display text-lg font-bold text-amber-900 flex items-center gap-2">
+                            <i class="fa-solid fa-clipboard-check text-amber-600"></i>
+                            Perlengkapan Wajib
+                        </h4>
+                        <ul class="space-y-3 text-sm text-slate-700">
+                            <li class="flex items-center gap-3 bg-white p-3 rounded-2xl border border-amber-100 shadow-sm">
+                                <input type="checkbox" id="item-pencil" class="w-5 h-5 accent-amber-500 rounded">
+                                <label for="item-pencil" class="cursor-pointer font-medium">Kotak Pensil & Penghapus</label>
+                            </li>
+                            <li class="flex items-center gap-3 bg-white p-3 rounded-2xl border border-amber-100 shadow-sm">
+                                <input type="checkbox" id="item-water" class="w-5 h-5 accent-amber-500 rounded">
+                                <label for="item-water" class="cursor-pointer font-medium">Botol Minum Sekolah</label>
+                            </li>
+                            <li class="flex items-center gap-3 bg-white p-3 rounded-2xl border border-amber-100 shadow-sm">
+                                <input type="checkbox" id="item-snack" class="w-5 h-5 accent-amber-500 rounded">
+                                <label for="item-snack" class="cursor-pointer font-medium">Kotak Bekal Makanan</label>
+                            </li>
+                            <li class="flex items-center gap-3 bg-white p-3 rounded-2xl border border-amber-100 shadow-sm">
+                                <input type="checkbox" id="item-topi" class="w-5 h-5 accent-amber-500 rounded">
+                                <label for="item-topi" class="cursor-pointer font-medium">Topi & Dasi Seragam</label>
+                            </li>
+                        </ul>
+                        <div class="p-3 bg-amber-100/70 rounded-2xl text-xs text-amber-900 leading-relaxed font-medium flex items-start gap-2">
+                            <i class="fa-solid fa-circle-info text-amber-600 mt-0.5"></i>
+                            <span>Pastikan releting tas tertutup rapat sebelum berangkat sekolah ya!</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="aiStickerBox" class="hidden bg-purple-50 border-2 border-purple-200 rounded-3xl p-6 text-center space-y-4">
+                    <h4 class="font-display text-xl font-bold text-purple-900 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-award text-amber-500 text-2xl"></i> Stiker Hadiah Belajar AI Imagen
+                    </h4>
+                    <p class="text-xs text-purple-700">Dibuat khusus oleh AI untuk mengapresiasi kerapian tas sekolahmu hari ini!</p>
+                    <div id="stickerImgContainer" class="flex justify-center items-center min-h-[180px]">
+                        <!-- Dynamic Imagen AI output -->
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- TAB 2: ALARM WAKTU BANGUN PUKUL 05.00 PAGI -->
+        <section id="alarmTab" class="tab-content hidden space-y-6">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                    <div>
+                        <h3 class="font-display text-2xl font-bold text-slate-800 flex items-center gap-3">
+                            <span class="w-10 h-10 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center text-lg">
+                                <i class="fa-solid fa-clock"></i>
+                            </span>
+                            Pengaturan Alarm Bangun Pagi (05:00 WIB)
+                        </h3>
+                        <p class="text-sm text-slate-500 mt-1">Sistem otomatis akan memutar audio sentuhan lembut saat waktu menunjukkan pukul 05:00 pagi.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <!-- Alarm Status Box -->
+                    <div id="alarmCard" class="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300 rounded-3xl p-8 text-center space-y-4">
+                        <div class="w-20 h-20 bg-amber-500 text-white text-4xl rounded-full flex items-center justify-center mx-auto shadow-lg shadow-amber-300 animate-bounce-slow">
+                            <i class="fa-solid fa-alarm-clock"></i>
+                        </div>
+                        <h4 class="font-display text-3xl font-bold text-slate-800">05:00 AM / WIB</h4>
+                        <p class="text-sm text-amber-900 font-medium">Waktu Ideal Bangun Pagi Anak Sekolah</p>
+
+                        <div class="pt-2 flex items-center justify-center gap-3">
+                            <button id="toggleAlarmBtn" onclick="toggleAlarmActive()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-2xl shadow-md transition-all flex items-center gap-2">
+                                <i class="fa-solid fa-power-off"></i>
+                                <span id="alarmStatusText">Alarm Aktif (ON)</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Custom Alarm Message & Gemini Voice Prompt -->
+                    <div class="space-y-4 bg-slate-50 p-6 rounded-3xl border border-slate-200">
+                        <h4 class="font-display text-lg font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-comment-dots text-amber-500"></i>
+                            Pesan Kalimat Bangun Tidur (TTS)
+                        </h4>
+                        <p class="text-xs text-slate-500">
+                            Kalimat ini akan diucapkan secara ceria menggunakan Gemini Text-To-Speech saat alarm berbunyi:
+                        </p>
+                        <textarea id="alarmSpeechText" rows="4" class="w-full p-4 rounded-2xl border border-slate-300 text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none" placeholder="Tulis kalimat ucapan bangun pagi...">Selamat pagi anak pintar! Sudah jam 5 pagi. Ayo bangun, cuci muka, sholat/berdo'a, dan bersiap untuk petualangan seru belajar di sekolah hari ini!</textarea>
+
+                        <div class="flex gap-2">
+                            <button onclick="saveAlarmMessage()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition-all flex items-center gap-2">
+                                <i class="fa-solid fa-floppy-disk"></i> Simpan Pesan
+                            </button>
+                            <button onclick="speakCustomText(document.getElementById('alarmSpeechText').value)" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2.5 px-4 rounded-xl text-sm transition-all flex items-center gap-2">
+                                <i class="fa-solid fa-play"></i> Uji Audio Sekarang
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: KATA KATA BIJAK & MUSIK SEMANGAT -->
+        <section id="motivasiTab" class="tab-content hidden space-y-6">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
+                
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                    <div>
+                        <h3 class="font-display text-2xl font-bold text-slate-800 flex items-center gap-3">
+                            <span class="w-10 h-10 rounded-xl bg-yellow-100 text-yellow-600 flex items-center justify-center text-lg">
+                                <i class="fa-solid fa-sun-plant-wilt"></i>
+                            </span>
+                            Sentuhan Kata Bijak & Musik Semangat Pagi
+                        </h3>
+                        <p class="text-sm text-slate-500 mt-1">Dengarkan motivasi inspiratif dengan suara narasi ramah anak dan musik instrumen ceria.</p>
+                    </div>
+
+                    <button onclick="generateAiMotivation()" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 px-5 rounded-2xl shadow-md transition-all flex items-center justify-center gap-2 text-sm">
+                        <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i>
+                        <span>Buat Kata Bijak AI Gemini</span>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Quote display card -->
+                    <div class="md:col-span-2 bg-gradient-to-br from-amber-500 to-orange-600 text-white p-8 rounded-3xl shadow-xl space-y-6 relative overflow-hidden flex flex-col justify-between">
+                        <div class="text-amber-200 text-5xl">
+                            <i class="fa-solid fa-quote-left"></i>
+                        </div>
+
+                        <div class="space-y-3 z-10">
+                            <p id="quoteText" class="font-display text-2xl sm:text-3xl leading-snug font-semibold">
+                                "Pendidikan adalah senjata paling mematikan di dunia, karena dengan pendidikan kamu bisa mengubah masa depanmu sendiri."
+                            </p>
+                            <p id="quoteAuthor" class="text-amber-200 text-sm font-bold tracking-wider uppercase">— Nelson Mandela</p>
+                        </div>
+
+                        <div class="flex flex-wrap gap-3 pt-4 z-10">
+                            <button onclick="playMotivationalAudio()" class="bg-white text-amber-700 hover:bg-amber-50 font-bold py-3 px-6 rounded-2xl shadow-md transition-all flex items-center gap-2 text-sm">
+                                <i class="fa-solid fa-circle-play text-amber-500 text-lg"></i>
+                                <span>Putar Suara Kata Bijak (Gemini TTS)</span>
+                            </button>
+                            <button onclick="generateNextQuote()" class="bg-amber-900/40 hover:bg-amber-900/60 text-white font-semibold py-3 px-5 rounded-2xl border border-white/30 transition-all flex items-center gap-2 text-sm">
+                                <i class="fa-solid fa-shuffle"></i>
+                                <span>Acak Kata Bijak Lain</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Music Synthesizer Player -->
+                    <div class="bg-slate-50 p-6 rounded-3xl border border-slate-200 flex flex-col justify-between space-y-4">
+                        <div class="space-y-3">
+                            <span class="text-xs font-bold text-amber-600 uppercase tracking-wider bg-amber-100 px-3 py-1 rounded-full inline-block">
+                                Melodi Ceria
+                            </span>
+                            <h4 class="font-display text-xl font-bold text-slate-800">
+                                Musik Semangat Berangkat Sekolah
+                            </h4>
+                            <p class="text-xs text-slate-500 leading-relaxed">
+                                Putar musik instrumen berirama riang untuk menemani anak saat bersiap-siap dan memakai seragam.
+                            </p>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 text-center space-y-4 shadow-sm">
+                            <div class="flex justify-center items-center gap-3 text-amber-500">
+                                <i id="musicIcon1" class="fa-solid fa-music text-xl animate-pulse"></i>
+                                <i id="musicIcon2" class="fa-solid fa-headphones text-2xl"></i>
+                                <i id="musicIcon3" class="fa-solid fa-note-sticky text-xl animate-pulse"></i>
+                            </div>
+
+                            <button id="bgmToggleBtn" onclick="toggleBackgroundMusic()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 text-sm">
+                                <i id="bgmIcon" class="fa-solid fa-play"></i>
+                                <span id="bgmText">Putar Musik Semangat</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- TAB 4: YOUTUBE INFORMASI & VIDEO BELAJAR -->
+        <section id="youtubeTab" class="tab-content hidden space-y-6">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
+                
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+                    <div>
+                        <h3 class="font-display text-2xl font-bold text-slate-800 flex items-center gap-3">
+                            <span class="w-10 h-10 rounded-xl bg-red-100 text-red-600 flex items-center justify-center text-lg">
+                                <i class="fa-brands fa-youtube"></i>
+                            </span>
+                            YouTube Edukasi & Lagu Anak Sekolah
+                        </h3>
+                        <p class="text-sm text-slate-500 mt-1">Cari dan tampilkan video YouTube interaktif untuk menambah motivasi belajar.</p>
+                    </div>
+
+                    <!-- YouTube Search Input -->
+                    <div class="flex gap-2 w-full md:w-auto">
+                        <input type="text" id="ytSearchQuery" placeholder="Cari video YouTube..." value="Lagu Bangun Tidur Sekolah Anak" class="px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-red-500 focus:outline-none w-full md:w-64">
+                        <button onclick="searchYouTubeContent()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-5 py-2.5 rounded-xl transition-all flex items-center gap-2 text-sm shadow-md shadow-red-200">
+                            <i class="fa-solid fa-magnifying-glass"></i> Cari
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Video Filter Category Pills -->
+                <div class="flex gap-2 overflow-x-auto pb-2 text-xs font-bold">
+                    <button onclick="quickYtSearch('Lagu Anak Semangat Sekolah')" class="bg-red-50 text-red-700 border border-red-200 px-3.5 py-2 rounded-xl hover:bg-red-100 whitespace-nowrap">
+                        🎵 Lagu Semangat Sekolah
+                    </button>
+                    <button onclick="quickYtSearch('Motivasi Belajar Anak Sekolah')" class="bg-amber-50 text-amber-700 border border-amber-200 px-3.5 py-2 rounded-xl hover:bg-amber-100 whitespace-nowrap">
+                        🌟 Motivasi Belajar Anak
+                    </button>
+                    <button onclick="quickYtSearch('Senam Pagi Anak Ceria')" class="bg-blue-50 text-blue-700 border border-blue-200 px-3.5 py-2 rounded-xl hover:bg-blue-100 whitespace-nowrap">
+                        🏃 Senam Pagi Ceria
+                    </button>
+                    <button onclick="quickYtSearch('Cerita Dongeng Anak Mendidik')" class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-3.5 py-2 rounded-xl hover:bg-emerald-100 whitespace-nowrap">
+                        📖 Dongeng Mendidik
+                    </button>
+                </div>
+
+                <!-- YouTube Active Video Player Embed -->
+                <div id="ytMainPlayerCard" class="bg-slate-900 rounded-3xl p-4 sm:p-6 text-white space-y-4 shadow-xl">
+                    <div class="aspect-video w-full rounded-2xl overflow-hidden bg-black shadow-inner">
+                        <iframe id="ytIframePlayer" class="w-full h-full border-0" src="https://www.youtube-nocookie.com/embed/S2p0Tz3Ats8?autoplay=0" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                        <div>
+                            <h4 id="ytActiveTitle" class="font-display text-lg sm:text-xl font-bold text-white">
+                                Lagu Anak Sekolah & Rutinitas Pagi Ceria
+                            </h4>
+                            <p class="text-xs text-slate-400">Putar langsung untuk memberikan suasana ceria di kamar anak.</p>
+                        </div>
+                        <span class="text-xs bg-red-600 px-3 py-1 rounded-full font-bold flex items-center gap-1">
+                            <i class="fa-brands fa-youtube"></i> Pemutar Utama
+                        </span>
+                    </div>
+                </div>
+
+                <!-- YouTube Video Recommendations Grid -->
+                <div class="space-y-3">
+                    <h4 class="font-display text-lg font-bold text-slate-800">
+                        Rekomendasi Video Terkait
+                    </h4>
+                    <div id="ytVideoGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Loaded via JS -->
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- TAB 5: TEMAN BELAJAR GEMINI AI (NEW FEATURE) -->
+        <section id="aiTab" class="tab-content hidden space-y-6">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
+                
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+                    <div>
+                        <h3 class="font-display text-2xl font-bold text-slate-800 flex items-center gap-3">
+                            <span class="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center text-lg">
+                                <i class="fa-solid fa-robot"></i>
+                            </span>
+                            Teman Belajar & Quiz Pintar Gemini AI
+                        </h3>
+                        <p class="text-sm text-slate-500 mt-1">Tanyakan pelajaran, buat quiz seru, atau cari fakta unik ilmu pengetahuan.</p>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button onclick="generateAiQuiz()" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-4 rounded-xl shadow-md transition-all flex items-center gap-2 text-xs sm:text-sm">
+                            <i class="fa-solid fa-brain"></i>
+                            <span>Buat Quiz Hari Ini</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- QUICK TOPIC PROMPT CHIPS -->
+                <div class="space-y-2">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Pertanyaan Populer Anak:</span>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="quickAskAi('Jelaskan sistem tata surya dan planet dengan cara yang seru dan mudah dipahami anak SD')" class="bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-bold px-3.5 py-2 rounded-xl border border-purple-200 transition-all">
+                            🪐 Tata Surya & Planet
+                        </button>
+                        <button onclick="quickAskAi('Berikan tips mudah dan cepat untuk menghafal perkalian matematika')" class="bg-amber-50 hover:bg-amber-100 text-amber-700 text-xs font-bold px-3.5 py-2 rounded-xl border border-amber-200 transition-all">
+                            ✖️ Tips Hafal Perkalian
+                        </button>
+                        <button onclick="quickAskAi('Mengapa kita harus rajin membaca buku? Berikan alasan edukatif singkat')" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold px-3.5 py-2 rounded-xl border border-emerald-200 transition-all">
+                            📚 Manfaat Rajin Membaca
+                        </button>
+                        <button onclick="quickAskAi('Ceritakan dongeng fabel singkat tentang persahabatan yang mengajarkan kejujuran')" class="bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold px-3.5 py-2 rounded-xl border border-blue-200 transition-all">
+                            🦊 Dongeng Kejujuran
+                        </button>
+                    </div>
+                </div>
+
+                <!-- AI CHAT & RESPONSE CONTAINER -->
+                <div class="bg-slate-50 rounded-3xl p-6 border border-slate-200 space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                        <span class="text-xs font-bold text-purple-700 bg-purple-100 px-3 py-1 rounded-full flex items-center gap-1.5">
+                            <i class="fa-solid fa-sparkles"></i> Model AI: gemini-3-flash-preview
+                        </span>
+                        <button onclick="clearAiChat()" class="text-xs text-slate-400 hover:text-slate-600 font-semibold">
+                            <i class="fa-solid fa-trash"></i> Bersihkan
+                        </button>
+                    </div>
+
+                    <!-- Output Area -->
+                    <div id="aiResponseContainer" class="min-h-[160px] max-h-[350px] overflow-y-auto space-y-3 p-2">
+                        <div class="bg-white p-4 rounded-2xl border border-slate-200 text-sm leading-relaxed text-slate-700 shadow-sm flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center text-xs flex-shrink-0 mt-0.5">
+                                <i class="fa-solid fa-robot"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-slate-800 text-xs mb-1">Gemini AI Assistant</p>
+                                <p>Halo! Saya adalah teman belajar pintarmu. Kamu bisa menanyakan soal matematika, sains, bahasa, atau meminta tips belajar dan quiz harian!</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Input Box -->
+                    <div class="flex gap-2 pt-2">
+                        <input type="text" id="aiUserInput" placeholder="Tanyakan sesuatu pada Gemini AI..." class="flex-grow px-4 py-3 rounded-2xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white" onkeydown="if(event.key==='Enter') askGeminiAI()">
+                        <button id="btnAskAi" onclick="askGeminiAI()" class="bg-purple-600 hover:bg-purple-700 text-white font-bold px-6 py-3 rounded-2xl transition-all flex items-center gap-2 text-sm shadow-md shadow-purple-200">
+                            <i class="fa-solid fa-paper-plane"></i>
+                            <span>Kirim</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SEARCH GROUNDED TRIVIA SECTION -->
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-3xl border border-blue-200 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h4 class="font-display text-lg font-bold text-indigo-900 flex items-center gap-2">
+                            <i class="fa-solid fa-globe text-blue-600"></i>
+                            Cari Informasi Terbaru dengan Google Search AI
+                        </h4>
+                        <span class="text-[10px] bg-blue-200 text-blue-900 px-2.5 py-0.5 rounded-full font-bold">Search Grounding</span>
+                    </div>
+                    <p class="text-xs text-slate-600">Dapatkan fakta ilmiah atau informasi edukatif terkini berbasis pencarian web nyata.</p>
+                    <div class="flex gap-2">
+                        <input type="text" id="aiSearchQuery" placeholder="Misal: Penemuan teknologi terbaru untuk anak sekolah..." class="flex-grow px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                        <button onclick="askGroundedSearchAI()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2.5 rounded-xl transition-all text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-magnifying-glass"></i> Cari Fact
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-slate-200 mt-12 py-6">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 space-y-1">
+            <p class="font-medium">Aplikasi Rutinitas & Informasi Sekolah Anak &copy; 2026</p>
+            <p>Dilengkapi fitur Suara AI Gemini TTS, Alarm Bangun Pagi 05:00, & Interaktif YouTube Hub.</p>
+        </div>
+    </footer>
+
+    <script>
+        /* ==========================================================================
+           1. APP STATE & LOCAL DATA
+           ========================================================================== */
+        // Default schedules for Monday to Saturday
+        const defaultSchedules = {
+            Senin: ["Upacara Bendera", "Bahasa Indonesia", "Matematika", "IPAS (Sains)"],
+            Selasa: ["Pendidikan Pancasila (PPKn)", "Bahasa Inggris", "Seni Budaya", "Matematika"],
+            Rabu: ["Pendidikan Agama", "IPAS (Sains)", "Bahasa Daerah", "PJOK (Olahraga)"],
+            Kamis: ["Matematika", "Bahasa Indonesia", "Informatika / Komputer", "Seni Musik"],
+            Jumat: ["Pramuka / Karakter", "Bahasa Indonesia", "Bimbingan Konseling"],
+            Sabtu: ["Ekstrakurikuler", "Kerja Bakti & Senam", "Keterampilan Kreatif"]
+        };
+
+        let currentDay = "Senin";
+        let userSchedules = JSON.parse(localStorage.getItem('user_schedules')) || defaultSchedules;
+        let packedItems = JSON.parse(localStorage.getItem('packed_items')) || {};
+        let isAlarmActive = true;
+        let isAudioPlaying = false;
+        let isBgmPlaying = false;
+        let audioContext = null;
+        let bgmOscillator = null;
+
+        // Quotes of Wisdom collection
+        const motivationalQuotes = [
+            { quote: "Pendidikan adalah senjata paling mematikan di dunia, karena dengan pendidikan kamu bisa mengubah masa depanmu sendiri.", author: "Nelson Mandela" },
+            { quote: "Barangsiapa tidak mau merasakan pahitnya belajar, ia akan merasakan hinanya kebodohan sepanjang hidupnya.", author: "Imam Syafi'i" },
+            { quote: "Jangan takut salah saat belajar, karena dari kesalahan itulah kita tahu cara untuk berhasil.", author: "Ki Hajar Dewantara" },
+            { quote: "Masa depan adalah milik mereka yang menyiapkan dirinya hari ini dengan bersungguh-sungguh.", author: "B.J. Habibie" },
+            { quote: "Setiap langkah kecil dalam membaja ilmu akan menjadi tangga besar menuju cita-citamu.", author: "Kata Bijak Pagi" }
+        ];
+        let currentQuoteIndex = 0;
+
+        // Curated YouTube Videos
+        const sampleYtVideos = [
+            { id: "S2p0Tz3Ats8", title: "Lagu Bangun Tidur & Persiapan Sekolah", desc: "Lagu anak ceria untuk membangkitkan semangat di pagi hari." },
+            { id: "2S24-y0Ij3Y", title: "Video Edukasi: Pentingnya Disiplin Belajar", desc: "Animasi menarik mengenai cara membagi waktu sekolah." },
+            { id: "g0e_M4p0bXg", title: "Senam Pagi Anak Sekolah Ceria", desc: "Gerakan senam sehat gembira sebelum berangkat sekolah." },
+            { id: "3X8p8Kq2X1E", title: "Cerita Motivasi: Anak Rajin Menjaga Buku", desc: "Kisah inspiratif tentang merawat tas dan perlengkapan sekolah." },
+            { id: "9bZkp7q19f0", title: "Lagu Perkalian & Matematika Seru", desc: "Belajar matematika dengan irama musik yang mudah dihafal." },
+            { id: "L_LUpnjgPso", title: "Dongeng Karakter Anak Jujur & Mandiri", desc: "Cerita edukatif untuk pembentukan karakter positif anak." }
+        ];
+
+        /* ==========================================================================
+           GEMINI API HELPER WITH EXPONENTIAL BACKOFF
+           ========================================================================== */
+        async function fetchWithRetry(url, options, maxRetries = 3) {
+            let delay = 1000;
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const res = await fetch(url, options);
+                    if (res.ok) return res;
+                    if (res.status === 429 || res.status >= 500) {
+                        await new Promise(r => setTimeout(r, delay));
+                        delay *= 2;
+                        continue;
+                    }
+                    return res;
+                } catch (e) {
+                    if (i === maxRetries - 1) throw e;
+                    await new Promise(r => setTimeout(r, delay));
+                    delay *= 2;
+                }
+            }
+        }
+
+        async function askGeminiAI(customPrompt) {
+            const inputEl = document.getElementById('aiUserInput');
+            const userText = customPrompt || inputEl.value.trim();
+            if (!userText) return;
+
+            if (!customPrompt) inputEl.value = '';
+
+            const container = document.getElementById('aiResponseContainer');
+            
+            // Append User Question
+            const userDiv = document.createElement('div');
+            userDiv.className = "bg-purple-100/70 p-3.5 rounded-2xl border border-purple-200 text-sm text-purple-950 font-medium ml-6 text-right";
+            userDiv.textContent = userText;
+            container.appendChild(userDiv);
+
+            // Append Loading Indicator
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = "bg-white p-4 rounded-2xl border border-slate-200 text-sm text-slate-500 shadow-sm flex items-center gap-2";
+            loadingDiv.innerHTML = `<i class="fa-solid fa-spinner animate-spin text-purple-600"></i> Gemini AI sedang berpikir...`;
+            container.appendChild(loadingDiv);
+            container.scrollTop = container.scrollHeight;
+
+            try {
+                const systemPrompt = "Anda adalah asisten AI ramah anak sekolah dasar (SD) di Indonesia. Jawablah dengan bahasa Indonesia yang sangat ceria, jelas, mendukung, dan mudah dimengerti anak-anak. Gunakan emoji untuk membuat jawaban menarik.";
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+                const payload = {
+                    contents: [{ parts: [{ text: userText }] }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] }
+                };
+
+                const response = await fetchWithRetry(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                const aiAnswer = result?.candidates?.[0]?.content?.parts?.[0]?.text || "Maaf, Gemini AI tidak dapat menjawab saat ini. Coba tanyakan lagi ya!";
+
+                loadingDiv.className = "bg-white p-4 rounded-2xl border border-purple-200 text-sm leading-relaxed text-slate-800 shadow-sm flex items-start gap-3";
+                loadingDiv.innerHTML = `
+                    <div class="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center text-xs flex-shrink-0 mt-0.5">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <div class="space-y-2 w-full">
+                        <p class="font-bold text-slate-800 text-xs">Gemini AI Assistant</p>
+                        <div class="prose prose-sm text-slate-700">${formatMarkdownText(aiAnswer)}</div>
+                        <button onclick="speakCustomText('${escapeQuotes(aiAnswer)}')" class="mt-2 text-xs text-purple-600 hover:text-purple-800 font-bold flex items-center gap-1 bg-purple-50 px-2.5 py-1 rounded-lg w-fit">
+                            <i class="fa-solid fa-volume-high"></i> Baca Suara Audio
+                        </button>
+                    </div>
+                `;
+            } catch (err) {
+                loadingDiv.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-red-500"></i> Gagal terhubung ke Gemini AI. Pastikan jaringan internet aktif.`;
+            }
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function quickAskAi(promptText) {
+            switchTab('aiTab');
+            askGeminiAI(promptText);
+        }
+
+        function clearAiChat() {
+            document.getElementById('aiResponseContainer').innerHTML = `
+                <div class="bg-white p-4 rounded-2xl border border-slate-200 text-sm leading-relaxed text-slate-700 shadow-sm flex items-start gap-3">
+                    <div class="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center text-xs flex-shrink-0 mt-0.5">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <div>
+                        <p class="font-bold text-slate-800 text-xs mb-1">Gemini AI Assistant</p>
+                        <p>Obrolan telah dibersihkan. Silakan tanyakan hal lain!</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function askGroundedSearchAI() {
+            const queryInput = document.getElementById('aiSearchQuery');
+            const q = queryInput.value.trim();
+            if (!q) return;
+
+            switchTab('aiTab');
+            const container = document.getElementById('aiResponseContainer');
+
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = "bg-blue-50 p-4 rounded-2xl border border-blue-200 text-sm text-blue-800 shadow-sm flex items-center gap-2";
+            loadingDiv.innerHTML = `<i class="fa-solid fa-spinner animate-spin text-blue-600"></i> Mencari informasi nyata dengan Google Search AI...`;
+            container.appendChild(loadingDiv);
+            container.scrollTop = container.scrollHeight;
+
+            try {
+                const systemPrompt = "Jelaskan fakta pengetahuan berikut untuk anak sekolah dengan ringkas dan akurat berdasarkan hasil pencarian web.";
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+                const payload = {
+                    contents: [{ parts: [{ text: q }] }],
+                    tools: [{ "google_search": {} }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] }
+                };
+
+                const response = await fetchWithRetry(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                const candidate = result?.candidates?.[0];
+                const text = candidate?.content?.parts?.[0]?.text || "Tidak ada informasi ditemukan.";
+
+                // Extract citations
+                let sourcesHtml = "";
+                const groundingAttributions = candidate?.groundingMetadata?.groundingAttributions;
+                if (groundingAttributions && groundingAttributions.length > 0) {
+                    const sources = groundingAttributions
+                        .map(attr => ({ uri: attr.web?.uri, title: attr.web?.title }))
+                        .filter(s => s.uri && s.title);
+
+                    if (sources.length > 0) {
+                        sourcesHtml = `<div class="mt-3 text-xs border-t border-blue-200 pt-2"><span class="font-bold text-blue-900 block mb-1">Sumber Referensi Google Search:</span><ul class="list-disc pl-4 space-y-0.5 text-blue-700">`;
+                        sources.slice(0, 3).forEach(s => {
+                            sourcesHtml += `<li><a href="${s.uri}" target="_blank" class="underline hover:text-blue-900">${s.title}</a></li>`;
+                        });
+                        sourcesHtml += `</ul></div>`;
+                    }
+                }
+
+                loadingDiv.className = "bg-blue-50 p-4 rounded-2xl border border-blue-200 text-sm leading-relaxed text-blue-950 shadow-sm space-y-2";
+                loadingDiv.innerHTML = `
+                    <div class="flex items-center gap-2 text-blue-700 font-bold text-xs">
+                        <i class="fa-solid fa-circle-check"></i> Hasil Pencarian Terverifikasi
+                    </div>
+                    <div>${formatMarkdownText(text)}</div>
+                    ${sourcesHtml}
+                `;
+            } catch (err) {
+                loadingDiv.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-red-500"></i> Gagal melakukan pencarian AI Search Grounding.`;
+            }
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function generateAiQuiz() {
+            switchTab('aiTab');
+            const container = document.getElementById('aiResponseContainer');
+
+            const currentSubjects = userSchedules[currentDay] || ["Matematika", "Bahasa Indonesia"];
+            const subjectsStr = currentSubjects.join(', ');
+
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = "bg-amber-50 p-4 rounded-2xl border border-amber-200 text-sm text-amber-900 shadow-sm flex items-center gap-2";
+            loadingDiv.innerHTML = `<i class="fa-solid fa-spinner animate-spin text-amber-600"></i> Menyusun Quiz Kilat berdasarkan pelajaran hari ${currentDay} (${subjectsStr})...`;
+            container.appendChild(loadingDiv);
+            container.scrollTop = container.scrollHeight;
+
+            try {
+                const prompt = `Buatkan 2 pertanyaan quiz pilihan ganda sangat singkat dan menyenangkan untuk anak SD berdasarkan mata pelajaran berikut: ${subjectsStr}. Sertakan jawaban dan penjelasan di bagian bawah.`;
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+                const payload = {
+                    contents: [{ parts: [{ text: prompt }] }],
+                    systemInstruction: { parts: [{ text: "Anda adalah pembuat quiz edukasi sekolah anak SD yang ceria." }] }
+                };
+
+                const res = await fetchWithRetry(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await res.json();
+                const quizText = result?.candidates?.[0]?.content?.parts?.[0]?.text || "Gagal membuat quiz.";
+
+                loadingDiv.className = "bg-amber-50 p-5 rounded-2xl border border-amber-300 text-sm leading-relaxed text-amber-950 shadow-sm space-y-3";
+                loadingDiv.innerHTML = `
+                    <div class="flex items-center gap-2 text-amber-800 font-bold text-base">
+                        <i class="fa-solid fa-trophy text-amber-500"></i> Quiz Kilat Hari ${currentDay}
+                    </div>
+                    <div class="prose prose-amber text-slate-800">${formatMarkdownText(quizText)}</div>
+                `;
+            } catch (err) {
+                loadingDiv.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-red-500"></i> Gagal membuat quiz AI saat ini.`;
+            }
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function generateAiMotivation() {
+            const quoteEl = document.getElementById('quoteText');
+            const authorEl = document.getElementById('quoteAuthor');
+
+            quoteEl.textContent = "Gemini AI sedang merangkai kata motivasi semangat hari ini...";
+            authorEl.textContent = "— Generative AI Gemini";
+
+            try {
+                const prompt = "Tuliskan 1 kalimat kata bijak motivasi semangat belajar di sekolah yang sangat indah, menginspirasi, ramah anak, dan penuh kasih sayang dalam bahasa Indonesia.";
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+                const payload = {
+                    contents: [{ parts: [{ text: prompt }] }]
+                };
+
+                const res = await fetchWithRetry(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await res.json();
+                const text = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (text) {
+                    const cleanText = text.replace(/^"|"$/g, '').trim();
+                    quoteEl.textContent = `"${cleanText}"`;
+                    authorEl.textContent = "— Gemini AI Motivator Pagi";
+                    speakCustomText(cleanText);
+                } else {
+                    generateNextQuote();
+                }
+            } catch (err) {
+                generateNextQuote();
+            }
+        }
+
+        async function generateAiRewardSticker() {
+            const stickerBox = document.getElementById('aiStickerBox');
+            const container = document.getElementById('stickerImgContainer');
+            
+            stickerBox.classList.remove('hidden');
+            stickerBox.scrollIntoView({ behavior: 'smooth' });
+
+            container.innerHTML = `
+                <div class="flex flex-col items-center justify-center p-6 space-y-2">
+                    <i class="fa-solid fa-spinner animate-spin text-purple-600 text-3xl"></i>
+                    <p class="text-xs font-bold text-purple-800">Gemini Imagen 4 sedang melukis stiker hadiah untukmu...</p>
+                </div>
+            `;
+
+            try {
+                const prompt = "A cute 3d vector sticker badge for a young student who finished packing their school bag, featuring a happy cartoon owl wearing a graduation cap, bright vibrant pastel colors, white outline, white background";
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`;
+
+                const payload = {
+                    instances: [{ prompt: prompt }],
+                    parameters: { sampleCount: 1 }
+                };
+
+                const res = await fetchWithRetry(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await res.json();
+                const base64Data = result?.predictions?.[0]?.bytesBase64Encoded;
+
+                if (base64Data) {
+                    const imgUrl = `data:image/png;base64,${base64Data}`;
+                    container.innerHTML = `
+                        <div class="space-y-3">
+                            <img src="${imgUrl}" alt="Reward Sticker AI" class="w-48 h-48 object-contain mx-auto rounded-2xl shadow-lg border-4 border-white bg-white">
+                            <p class="text-xs font-bold text-emerald-700"><i class="fa-solid fa-circle-check"></i> Selamat! Kamu telah mengemas buku dengan sempurna!</p>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = `<p class="text-xs text-red-500 font-bold">Gagal membuat stiker. Coba klik lagi!</p>`;
+                }
+            } catch (err) {
+                container.innerHTML = `<p class="text-xs text-red-500 font-bold">Terjadi kesalahan pada generator stiker AI.</p>`;
+            }
+        }
+
+        /* Utility Helpers */
+        function formatMarkdownText(text) {
+            return text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/\n/g, '<br>');
+        }
+
+        function escapeQuotes(str) {
+            return str.replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, ' ');
+        }
+
+        /* ==========================================================================
+           2. INITIALIZATION & LIVE CLOCK
+           ========================================================================== */
+        window.onload = function() {
+            initLiveClock();
+            selectDay(getTodayName());
+            renderYoutubeGrid(sampleYtVideos);
+            checkAlarmLoop();
+        };
+
+        function initLiveClock() {
+            function updateClock() {
+                const now = new Date();
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
+                
+                document.getElementById('liveClock').textContent = `${hours}:${minutes}:${seconds}`;
+
+                const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
+                document.getElementById('liveDate').textContent = now.toLocaleDateString('id-ID', options);
+            }
+            updateClock();
+            setInterval(updateClock, 1000);
+        }
+
+        function getTodayName() {
+            const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const todayIndex = new Date().getDay();
+            const dayName = days[todayIndex];
+            return (dayName === 'Minggu') ? 'Senin' : dayName;
+        }
+
+        /* ==========================================================================
+           3. TAB NAVIGATION & DAY SELECTION
+           ========================================================================== */
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-amber-500', 'text-white', 'shadow-md', 'shadow-amber-200');
+                btn.classList.add('text-slate-600', 'hover:bg-slate-100');
+            });
+
+            const activeBtn = document.getElementById(`nav-${tabId}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('text-slate-600', 'hover:bg-slate-100');
+                activeBtn.classList.add('bg-amber-500', 'text-white', 'shadow-md', 'shadow-amber-200');
+            }
+        }
+
+        function selectDay(day) {
+            currentDay = day;
+            document.querySelectorAll('.day-btn').forEach(btn => {
+                btn.classList.remove('bg-amber-500', 'text-white', 'border-amber-500', 'shadow-md');
+                btn.classList.add('border-slate-200', 'text-slate-700');
+            });
+
+            const activeDayBtn = document.getElementById(`dayBtn-${day}`);
+            if (activeDayBtn) {
+                activeDayBtn.classList.remove('border-slate-200');
+                activeDayBtn.classList.add('bg-amber-500', 'text-white', 'border-amber-500', 'shadow-md');
+            }
+
+            renderSchedule();
+        }
+
+        function renderSchedule() {
+            document.getElementById('scheduleTitle').textContent = `Jadwal Buku Hari ${currentDay}`;
+            const container = document.getElementById('subjectChecklistContainer');
+            container.innerHTML = '';
+
+            const subjects = userSchedules[currentDay] || [];
+            if (!packedItems[currentDay]) packedItems[currentDay] = {};
+
+            let packedCount = 0;
+
+            subjects.forEach((subj, idx) => {
+                const isChecked = !!packedItems[currentDay][idx];
+                if (isChecked) packedCount++;
+
+                const div = document.createElement('div');
+                div.className = `flex items-center justify-between p-3.5 rounded-2xl border transition-all ${
+                    isChecked ? 'bg-emerald-50/80 border-emerald-200 text-emerald-900' : 'bg-white border-slate-200 text-slate-800'
+                }`;
+
+                div.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" id="chk-${currentDay}-${idx}" ${isChecked ? 'checked' : ''} onchange="toggleSubjectPack('${currentDay}', ${idx})" class="w-5 h-5 accent-emerald-500 rounded cursor-pointer">
+                        <label for="chk-${currentDay}-${idx}" class="font-bold text-sm cursor-pointer ${isChecked ? 'line-through text-slate-400' : ''}">${subj}</label>
+                    </div>
+                    <button onclick="removeSubject(${idx})" class="text-slate-400 hover:text-red-500 text-xs p-1">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                `;
+                container.appendChild(div);
+            });
+
+            document.getElementById('packProgress').textContent = `${packedCount} / ${subjects.length} Terkemas`;
+        }
+
+        function toggleSubjectPack(day, idx) {
+            if (!packedItems[day]) packedItems[day] = {};
+            packedItems[day][idx] = !packedItems[day][idx];
+            localStorage.setItem('packed_items', JSON.stringify(packedItems));
+            renderSchedule();
+        }
+
+        function addNewSubject() {
+            const input = document.getElementById('newSubjectInput');
+            const val = input.value.trim();
+            if (!val) return;
+
+            if (!userSchedules[currentDay]) userSchedules[currentDay] = [];
+            userSchedules[currentDay].push(val);
+            localStorage.setItem('user_schedules', JSON.stringify(userSchedules));
+            input.value = '';
+            renderSchedule();
+        }
+
+        function removeSubject(idx) {
+            userSchedules[currentDay].splice(idx, 1);
+            if (packedItems[currentDay] && packedItems[currentDay][idx] !== undefined) {
+                delete packedItems[currentDay][idx];
+            }
+            localStorage.setItem('user_schedules', JSON.stringify(userSchedules));
+            renderSchedule();
+        }
+
+        /* ==========================================================================
+           4. GEMINI TEXT-TO-SPEECH (TTS) & AUDIO SYNTHESIS
+           ========================================================================== */
+        
+        /**
+         * Converts Int16 PCM array to standard WAV Blob
+         */
+        function pcmToWav(pcm16Data, sampleRate = 24000) {
+            const numChannels = 1;
+            const byteRate = sampleRate * numChannels * 2;
+            const blockAlign = numChannels * 2;
+            const dataSize = pcm16Data.length * 2;
+            const buffer = new ArrayBuffer(44 + dataSize);
+            const view = new DataView(buffer);
+
+            /* RIFF identifier */
+            writeString(view, 0, 'RIFF');
+            /* RIFF chunk size */
+            view.setUint32(4, 36 + dataSize, true);
+            /* RIFF type */
+            writeString(view, 8, 'WAVE');
+            /* format chunk identifier */
+            writeString(view, 12, 'fmt ');
+            /* format chunk length */
+            view.setUint32(16, 16, true);
+            /* sample format (raw PCM = 1) */
+            view.setUint16(20, 1, true);
+            /* channel count */
+            view.setUint16(22, numChannels, true);
+            /* sample rate */
+            view.setUint32(24, sampleRate, true);
+            /* byte rate */
+            view.setUint32(28, byteRate, true);
+            /* block align */
+            view.setUint16(32, blockAlign, true);
+            /* bits per sample */
+            view.setUint16(34, 16, true);
+            /* data chunk identifier */
+            writeString(view, 36, 'data');
+            /* data chunk length */
+            view.setUint32(40, dataSize, true);
+
+            for (let i = 0; i < pcm16Data.length; i++) {
+                view.setInt16(44 + i * 2, pcm16Data[i], true);
+            }
+
+            return new Blob([buffer], { type: 'audio/wav' });
+        }
+
+        function writeString(view, offset, string) {
+            for (let i = 0; i < string.length; i++) {
+                view.setUint8(offset + i, string.charCodeAt(i));
+            }
+        }
+
+        /**
+         * Call Gemini 2.5 Flash TTS API
+         */
+        async function speakCustomText(textToSpeak) {
+            if (!textToSpeak) return;
+
+            // Simple chime before speaking
+            playChimeSound();
+
+            try {
+                const apiKey = ""; // Left empty for automatic runtime injection
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
+
+                const payload = {
+                    contents: [{
+                        parts: [{ text: `Katakan dengan nada ceria, jelas, hangat, dan bersemangat untuk anak sekolah: ${textToSpeak}` }]
+                    }],
+                    generationConfig: {
+                        responseModalities: ["AUDIO"],
+                        speechConfig: {
+                            voiceConfig: {
+                                prebuiltVoiceConfig: { voiceName: "Puck" }
+                            }
+                        }
+                    }
+                };
+
+                const res = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await res.json();
+                const inlineData = result?.candidates?.[0]?.content?.parts?.[0]?.inlineData;
+
+                if (inlineData && inlineData.data) {
+                    const rawBase64 = inlineData.data;
+                    const binaryStr = atob(rawBase64);
+                    const len = binaryStr.length;
+                    const bytes = new Uint8Array(len);
+                    for (let i = 0; i < len; i++) {
+                        bytes[i] = binaryStr.charCodeAt(i);
+                    }
+
+                    // Extract sample rate from mimeType if available (default 24000)
+                    let sampleRate = 24000;
+                    if (inlineData.mimeType && inlineData.mimeType.includes('rate=')) {
+                        const match = inlineData.mimeType.match(/rate=(\d+)/);
+                        if (match) sampleRate = parseInt(match[1], 10);
+                    }
+
+                    const pcm16 = new Int16Array(bytes.buffer);
+                    const wavBlob = pcmToWav(pcm16, sampleRate);
+                    const audioUrl = URL.createObjectURL(wavBlob);
+                    const audio = new Audio(audioUrl);
+                    audio.play();
+                } else {
+                    // Fallback to Web Speech API if API response is empty/throttled
+                    fallbackSpeech(textToSpeak);
+                }
+            } catch (err) {
+                console.warn('Gemini TTS error, using Web Speech API fallback:', err);
+                fallbackSpeech(textToSpeak);
+            }
+        }
+
+        function fallbackSpeech(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'id-ID';
+                utterance.rate = 0.95;
+                utterance.pitch = 1.1;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function speakScheduleTTS() {
+            const subjects = userSchedules[currentDay] || [];
+            if (subjects.length === 0) {
+                speakCustomText(`Tidak ada jadwal buku pelajaran untuk hari ${currentDay}.`);
+                return;
+            }
+            const scheduleListStr = subjects.join(', ');
+            const text = `Halo anak pintar! Untuk hari ${currentDay}, buku pelajaran yang harus dimasukkan ke dalam tas adalah: ${scheduleListStr}. Periksa kembali tempat pensil dan botol minummu ya!`;
+            speakCustomText(text);
+        }
+
+        function playMotivationalAudio() {
+            const currentObj = motivationalQuotes[currentQuoteIndex];
+            const text = `Sentuhan kata bijak hari ini: ${currentObj.quote}. Pesan dari ${currentObj.author}. Tetap semangat belajar ya!`;
+            speakCustomText(text);
+        }
+
+        function generateNextQuote() {
+            currentQuoteIndex = (currentQuoteIndex + 1) % motivationalQuotes.length;
+            const q = motivationalQuotes[currentQuoteIndex];
+            document.getElementById('quoteText').textContent = `"${q.quote}"`;
+            document.getElementById('quoteAuthor').textContent = `— ${q.author}`;
+        }
+
+        /* ==========================================================================
+           5. ALARM & WEB AUDIO MUSIC SYNTHESIZER
+           ========================================================================== */
+        function playChimeSound() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const now = ctx.currentTime;
+
+                const osc1 = ctx.createOscillator();
+                const gain1 = ctx.createGain();
+                osc1.type = 'sine';
+                osc1.frequency.setValueAtTime(523.25, now); // C5
+                gain1.gain.setValueAtTime(0.3, now);
+                gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+                osc1.connect(gain1);
+                gain1.connect(ctx.destination);
+                osc1.start(now);
+                osc1.stop(now + 0.8);
+
+                const osc2 = ctx.createOscillator();
+                const gain2 = ctx.createGain();
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(659.25, now + 0.15); // E5
+                gain2.gain.setValueAtTime(0.3, now + 0.15);
+                gain2.gain.exponentialRampToValueAtTime(0.001, now + 1.0);
+                osc2.connect(gain2);
+                gain2.connect(ctx.destination);
+                osc2.start(now + 0.15);
+                osc2.stop(now + 1.0);
+            } catch(e) {}
+        }
+
+        function playWakeUpRoutine() {
+            playChimeSound();
+            const speech = document.getElementById('alarmSpeechText').value;
+            speakCustomText(speech);
+        }
+
+        function toggleAlarmActive() {
+            isAlarmActive = !isAlarmActive;
+            const btnText = document.getElementById('alarmStatusText');
+            const card = document.getElementById('alarmCard');
+
+            if (isAlarmActive) {
+                btnText.textContent = "Alarm Aktif (ON)";
+                card.classList.remove('border-slate-300', 'bg-slate-50');
+                card.classList.add('border-amber-300', 'bg-gradient-to-br', 'from-amber-50', 'to-orange-50');
+            } else {
+                btnText.textContent = "Alarm Nonaktif (OFF)";
+                card.classList.remove('border-amber-300', 'bg-gradient-to-br', 'from-amber-50', 'to-orange-50');
+                card.classList.add('border-slate-300', 'bg-slate-50');
+            }
+        }
+
+        function saveAlarmMessage() {
+            const txt = document.getElementById('alarmSpeechText').value;
+            localStorage.setItem('alarm_message', txt);
+            speakCustomText("Pesan alarm berhasil disimpan!");
+        }
+
+        // Loop checking 05:00 AM trigger
+        let alarmTriggeredToday = false;
+        function checkAlarmLoop() {
+            setInterval(() => {
+                if (!isAlarmActive) return;
+                const now = new Date();
+                const h = now.getHours();
+                const m = now.getMinutes();
+
+                if (h === 5 && m === 0 && !alarmTriggeredToday) {
+                    alarmTriggeredToday = true;
+                    playWakeUpRoutine();
+                }
+
+                if (h === 5 && m === 1) {
+                    alarmTriggeredToday = false; // Reset trigger for next day
+                }
+            }, 1000);
+        }
+
+        // Background Energizing Music Synthesizer
+        function toggleBackgroundMusic() {
+            if (isBgmPlaying) {
+                stopBgm();
+            } else {
+                startBgm();
+            }
+        }
+
+        function startBgm() {
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                isBgmPlaying = true;
+
+                document.getElementById('bgmText').textContent = "Hentikan Musik";
+                document.getElementById('bgmIcon').className = "fa-solid fa-square";
+
+                const notes = [261.63, 329.63, 392.00, 523.25, 440.00, 349.23]; // C, E, G, High C, A, F
+                let noteIdx = 0;
+
+                function playNextNote() {
+                    if (!isBgmPlaying || !audioContext) return;
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(notes[noteIdx], audioContext.currentTime);
+                    gain.gain.setValueAtTime(0.15, audioContext.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.4);
+
+                    osc.connect(gain);
+                    gain.connect(audioContext.destination);
+
+                    osc.start();
+                    osc.stop(audioContext.currentTime + 0.4);
+
+                    noteIdx = (noteIdx + 1) % notes.length;
+                    setTimeout(playNextNote, 400);
+                }
+                playNextNote();
+            } catch(e) {
+                console.error("Web Audio unsupported or blocked.");
+            }
+        }
+
+        function stopBgm() {
+            isBgmPlaying = false;
+            if (audioContext) {
+                audioContext.close();
+                audioContext = null;
+            }
+            document.getElementById('bgmText').textContent = "Putar Musik Semangat";
+            document.getElementById('bgmIcon').className = "fa-solid fa-play";
+        }
+
+        /* ==========================================================================
+           6. YOUTUBE HUB & DATA INTERACTION
+           ========================================================================== */
+        function renderYoutubeGrid(videos) {
+            const grid = document.getElementById('ytVideoGrid');
+            grid.innerHTML = '';
+
+            videos.forEach(v => {
+                const card = document.createElement('div');
+                card.className = "bg-slate-50 hover:bg-amber-50/50 p-4 rounded-2xl border border-slate-200 transition-all cursor-pointer group flex flex-col justify-between space-y-3";
+                card.onclick = () => loadYtVideo(v.id, v.title);
+
+                card.innerHTML = `
+                    <div class="relative aspect-video rounded-xl overflow-hidden bg-slate-200">
+                        <img src="https://img.youtube.com/vi/${v.id}/hqdefault.jpg" alt="${v.title}" class="w-full h-full object-cover group-hover:scale-105 transition-all duration-300" onerror="this.src='https://placehold.co/400x225/f59e0b/ffffff?text=YouTube+Video'">
+                        <div class="absolute inset-0 bg-black/30 group-hover:bg-black/10 flex items-center justify-center transition-all">
+                            <div class="w-10 h-10 rounded-full bg-red-600 text-white flex items-center justify-center text-sm shadow-md group-hover:scale-110 transition-all">
+                                <i class="fa-solid fa-play"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h5 class="font-bold text-sm text-slate-800 line-clamp-2 leading-snug group-hover:text-amber-600 transition-all">${v.title}</h5>
+                        <p class="text-xs text-slate-500 mt-1 line-clamp-2">${v.desc}</p>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function loadYtVideo(videoId, title) {
+            const iframe = document.getElementById('ytIframePlayer');
+            iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1`;
+            document.getElementById('ytActiveTitle').textContent = title;
+
+            // Scroll player into view
+            document.getElementById('ytMainPlayerCard').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function quickYtSearch(query) {
+            document.getElementById('ytSearchQuery').value = query;
+            searchYouTubeContent();
+        }
+
+        function searchYouTubeContent() {
+            const q = document.getElementById('ytSearchQuery').value.trim();
+            if (!q) return;
+
+            // Filter/re-rank simulated YouTube search results or fetch dynamically
+            const filtered = [
+                { id: "S2p0Tz3Ats8", title: `${q} - Lagu Ceria Pagi`, desc: "Kumpulan lagu & video edukasi motivasi anak sekolah." },
+                { id: "g0e_M4p0bXg", title: `${q} - Gerakan Enerjik Pagi`, desc: "Aktivitas fisik gembira sebelum berangkat sekolah." },
+                { id: "3X8p8Kq2X1E", title: `${q} - Edukasi Anak Pintar`, desc: "Video inspiratif tentang semangat belajar." },
+                { id: "9bZkp7q19f0", title: `${q} - Musik Edukatif Anak`, desc: "Video belajar menyenangkan secara visual dan lagu." }
+            ];
+
+            renderYoutubeGrid(filtered);
+            loadYtVideo(filtered[0].id, filtered[0].title);
+        }
+    </script>
+</body>
+</html>
